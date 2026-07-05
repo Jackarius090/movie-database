@@ -29,11 +29,11 @@ export default function FilterPanel() {
       <div className="flex">
         <Select>
           <SelectTrigger className="w-full max-w-48">
-            <SelectValue />
+            <SelectValue placeholder="year" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background" side="bottom">
             <SelectGroup>
-              <SelectLabel>Fruits</SelectLabel>
+              <SelectLabel>Year</SelectLabel>
               {years.map((year) => (
                 <SelectItem key={year} value={year}>
                   {year}
