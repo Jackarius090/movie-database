@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 
 export default function FilterPanel() {
   const years = Array.from(
@@ -16,17 +15,35 @@ export default function FilterPanel() {
     (_, i) => String(new Date().getFullYear() - i),
   );
 
+  const genres = [
+    "Action",
+    "Adventure",
+    "Animation",
+    "Biography",
+    "Comedy",
+    "Crime",
+    "Drama",
+    "Family",
+    "Fantasy",
+    "Film-Noir",
+    "History",
+    "Horror",
+    "Music",
+    "Musical",
+    "Mystery",
+    "Reality-TV",
+    "Romance",
+    "Sci-Fi",
+    "Sport",
+    "Thriller",
+    "War",
+    "Western",
+  ];
+
   return (
     <section className="flex justify-center items-center border gap-6 p-4">
-      <div className="flex">
-        <Label htmlFor="movie-name">Movie Name</Label>
-        <Input
-          id="movie-name"
-          name="movie-name"
-          placeholder="Enter a movie name"
-        />
-      </div>
-      <div className="flex">
+      <div className="flex gap-4">
+        <Input placeholder="Enter a movie name" />
         <Select>
           <SelectTrigger className="w-full max-w-48">
             <SelectValue placeholder="year" />
@@ -37,6 +54,22 @@ export default function FilterPanel() {
               {years.map((year) => (
                 <SelectItem key={year} value={year}>
                   {year}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <Input placeholder="Actor" />
+        <Select>
+          <SelectTrigger className="w-full max-w-48">
+            <SelectValue placeholder="genre" />
+          </SelectTrigger>
+          <SelectContent className="bg-background" side="bottom">
+            <SelectGroup>
+              <SelectLabel>Genre</SelectLabel>
+              {genres.map((genre) => (
+                <SelectItem key={genre} value={genre}>
+                  {genre}
                 </SelectItem>
               ))}
             </SelectGroup>
