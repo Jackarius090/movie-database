@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "./ui/label";
 
 export default function FilterPanel() {
   const years = Array.from(
@@ -75,6 +76,12 @@ export default function FilterPanel() {
             </SelectGroup>
           </SelectContent>
         </Select>
+        <div>
+          <Input id="rating" placeholder="rating" />
+          <Label htmlFor="rating" className="whitespace-nowrap p-1">
+            search for movies with your rating and above.
+          </Label>
+        </div>
       </div>
     </section>
   );
