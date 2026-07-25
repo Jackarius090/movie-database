@@ -1,3 +1,5 @@
+"use client";
+
 import { Input } from "./ui/input";
 import {
   Select,
@@ -9,8 +11,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "./ui/label";
+import { useState } from "react";
 
 export default function FilterPanel() {
+  const [searchParams, setSearchParams] = useState("");
   const years = Array.from(
     { length: new Date().getFullYear() - 1950 + 1 },
     (_, i) => String(new Date().getFullYear() - i),
