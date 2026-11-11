@@ -3,7 +3,20 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Star } from "lucide-react";
 
-export default function MovieCard({ data }) {
+type Movie = {
+  title: string | null;
+  genre: string | null;
+  rating: number | string | null;
+  year: number | null;
+  director_and_stars: string | null;
+  runtime: number | null;
+};
+
+type MovieCardProps = {
+  data: Movie;
+};
+
+export default function MovieCard({ data }: MovieCardProps) {
   const [isFavourite, setFavourite] = useState(false);
 
   return (
