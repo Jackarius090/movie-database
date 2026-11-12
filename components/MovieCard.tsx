@@ -2,15 +2,7 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Star } from "lucide-react";
-
-type Movie = {
-  title: string | null;
-  genre: string | null;
-  rating: number | string | null;
-  year: number | null;
-  director_and_stars: string | null;
-  runtime: number | null;
-};
+import type { Movie } from "@/lib/schemas/movie";
 
 type MovieCardProps = {
   data: Movie;

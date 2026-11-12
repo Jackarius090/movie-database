@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { movieSchema } from "@/lib/schemas/movie";
 
 import MovieCard from "../components/MovieCard";
 import FilterPanel from "@/components/FilterPanel";
@@ -15,7 +16,7 @@ export default function SearchPanel() {
         throw new Error("Failed to fetch movie");
       }
 
-      return response.json();
+      return movieSchema.parse(await response.json());
     },
   });
 
