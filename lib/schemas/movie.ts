@@ -12,4 +12,6 @@ export const movieSchema = z.object({
     .nullable(),
 });
 
-export type Movie = z.infer<typeof movieSchema>;
+export type Movies = z.infer<typeof moviesSchema>;
+
+export const moviesSchema = z.array(movieSchema);

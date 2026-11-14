@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Client } from "pg";
-import { movieSchema } from "@/lib/schemas/movie";
+import { moviesSchema } from "@/lib/schemas/movie";
 
 export async function GET() {
   const client = new Client({
@@ -11,32 +11,32 @@ export async function GET() {
     await client.connect();
 
     const result = await client.query(
-      "SELECT title, genre, rating, year, director_and_stars, runtime FROM movies LIMIT 1",
+      "SELECT title, genre, rating, year, director_and_stars, runtime FROM movies LIMIT 10",
     );
-    const row = result.rows[0];
+    const rows = result.rows;
 
-    if (!row) {
+    if (!rows) {
       return NextResponse.json({ error: "Movie not found" }, { status: 404 });
     }
 
-    const parsedMovie = movieSchema.safeParse(row);
+    const parsedMovies = moviesSchema.safeParse(rows);
 
-    if (!parsedMovie.success) {
+    if (!parsedMovies.success) {
       console.error(
-        "Invalid movie row returned from database:",
-        parsedMovie.error.issues,
+        "Invalid movie rows returned from database:",
+        parsedMovies.error.issues,
       );
       return NextResponse.json(
-        { error: "Unable to fetch movie" },
+        { error: "Unable to fetch movies" },
         { status: 500 },
       );
     }
 
-    return NextResponse.json(parsedMovie.data);
+    return NextResponse.json(parsedMovies.data);
   } catch (error) {
-    console.error("Failed to fetch movie:", error);
+    console.error("Failed to fetch movies:", error);
     return NextResponse.json(
-      { error: "Unable to fetch movie" },
+      { error: "Unable to fetch movies" },
       { status: 500 },
     );
   } finally {
