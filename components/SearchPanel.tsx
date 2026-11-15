@@ -31,7 +31,11 @@ export default function SearchPanel() {
   return (
     <section className="flex flex-col gap-4">
       <FilterPanel />
-      <MovieCard data={data} />
+      <div className="flex flex-col gap-4">
+        {data.map((movie, index) => (
+          <MovieCard key={`${movie.title ?? "movie"}-${index}`} movie={movie} />
+        ))}
+      </div>
     </section>
   );
 }
