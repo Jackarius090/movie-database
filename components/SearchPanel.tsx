@@ -1,19 +1,28 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { moviesSchema } from "@/lib/schemas/movie";
+import { moviesSchema, type MovieFilters } from "@/lib/schemas/movie";
 
 import MovieCard from "../components/MovieCard";
 import FilterPanel from "@/components/FilterPanel";
 
 export default function SearchPanel() {
+  const [filters, setFilters] = useState<MovieFilters>({});
+
   const { data, isPending, isError } = useQuery({
-    queryKey: ["movie"],
+    queryKey: ["movies", filters],
     queryFn: async () => {
-      const response = await fetch("/api/movies");
+      const params = new URLSearchParams();
+      if (filters.year !== undefined) {
+        params.set("year", String(filters.year));
+      }
+
+      const query = params.toString();
+      const response = await fetch(`/api/movies${query ? `?${query}` : ""}`);
 
       if (!response.ok) {
-        throw new Error("Failed to fetch movie");
+        throw new Error("Failed to fetch movies");
       }
 
       return moviesSchema.parse(await response.json());
@@ -30,7 +39,12 @@ export default function SearchPanel() {
 
   return (
     <section className="flex flex-col gap-4">
-      <FilterPanel />
+      <FilterPanel
+        filters={filters}
+        onYearChange={(year) =>
+          setFilters((currentFilters) => ({ ...currentFilters, year }))
+        }
+      />
       <div className="flex flex-col gap-4">
         {data.map((movie, index) => (
           <MovieCard key={`${movie.title ?? "movie"}-${index}`} movie={movie} />

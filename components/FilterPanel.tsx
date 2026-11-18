@@ -11,10 +11,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "./ui/label";
-import { useState } from "react";
+import type { MovieFilters } from "@/lib/schemas/movie";
 
-export default function FilterPanel() {
-  const [searchParams, setSearchParams] = useState("");
+type FilterPanelProps = {
+  filters: MovieFilters;
+  onYearChange: (year: number | undefined) => void;
+};
+
+export default function FilterPanel({
+  filters,
+  onYearChange,
+}: FilterPanelProps) {
   const years = Array.from(
     { length: new Date().getFullYear() - 1950 + 1 },
     (_, i) => String(new Date().getFullYear() - i),
@@ -49,13 +56,19 @@ export default function FilterPanel() {
     <section className="flex justify-center items-center border gap-6 p-4">
       <div className="flex gap-4">
         <Input placeholder="Enter a movie name" />
-        <Select>
+        <Select
+          value={filters.year?.toString() ?? "all"}
+          onValueChange={(value) =>
+            onYearChange(value === "all" || value === null ? undefined : Number(value))
+          }
+        >
           <SelectTrigger className="w-full max-w-48">
-            <SelectValue placeholder="year" />
+            <SelectValue placeholder="Any year" />
           </SelectTrigger>
           <SelectContent className="bg-background" side="bottom">
             <SelectGroup>
               <SelectLabel>Year</SelectLabel>
+              <SelectItem value="all">Any year</SelectItem>
               {years.map((year) => (
                 <SelectItem key={year} value={year}>
                   {year}

@@ -15,3 +15,13 @@ export const movieSchema = z.object({
 export type Movies = z.infer<typeof moviesSchema>;
 
 export const moviesSchema = z.array(movieSchema);
+
+export type MovieFilters = {
+  year?: number;
+};
+
+export const movieYearQuerySchema = z
+  .string()
+  .regex(/^\d{4}$/)
+  .transform(Number)
+  .pipe(z.number().int().min(1888).max(new Date().getFullYear()));

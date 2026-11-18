@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { Client } from "pg";
-import { moviesSchema } from "@/lib/schemas/movie";
+import {
+  moviesSchema,
+  movieYearQuerySchema,
+} from "@/lib/schemas/movie";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const yearParam = new URL(request.url).searchParams.get("year");
+  const parsedYear =
+    yearParam === null ? undefined : movieYearQuerySchema.safeParse(yearParam);
+
+  if (parsedYear && !parsedYear.success) {
+    return NextResponse.json({ error: "Invalid year" }, { status: 400 });
+  }
+
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
   });
@@ -10,9 +21,12 @@ export async function GET() {
   try {
     await client.connect();
 
-    const result = await client.query(
-      "SELECT title, genre, rating, year, director_and_stars, runtime FROM movies LIMIT 10",
-    );
+    const query =
+      parsedYear === undefined
+        ? "SELECT title, genre, rating, year, director_and_stars, runtime FROM movies LIMIT 100"
+        : "SELECT title, genre, rating, year, director_and_stars, runtime FROM movies WHERE year = $1 LIMIT 100";
+    const values = parsedYear ? [parsedYear.data] : [];
+    const result = await client.query(query, values);
     const rows = result.rows;
 
     if (!rows) {
