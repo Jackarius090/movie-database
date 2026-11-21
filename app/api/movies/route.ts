@@ -1,19 +1,18 @@
 import { NextResponse } from "next/server";
 import { Client } from "pg";
-import {
-  moviesSchema,
-  movieYearQuerySchema,
-} from "@/lib/schemas/movie";
+import { movieFiltersQuerySchema, moviesSchema } from "@/lib/schemas/movie";
 
 export async function GET(request: Request) {
-  const yearParam = new URL(request.url).searchParams.get("year");
-  const parsedYear =
-    yearParam === null ? undefined : movieYearQuerySchema.safeParse(yearParam);
+  const searchParams = new URL(request.url).searchParams;
+  const parsedFilters = movieFiltersQuerySchema.safeParse(
+    Object.fromEntries(searchParams.entries()),
+  );
 
-  if (parsedYear && !parsedYear.success) {
-    return NextResponse.json({ error: "Invalid year" }, { status: 400 });
+  if (!parsedFilters.success) {
+    return NextResponse.json({ error: "Invalid movie filters" }, { status: 400 });
   }
 
+  const filters = parsedFilters.data;
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
   });
@@ -21,11 +20,37 @@ export async function GET(request: Request) {
   try {
     await client.connect();
 
-    const query =
-      parsedYear === undefined
-        ? "SELECT title, genre, rating, year, director_and_stars, runtime FROM movies LIMIT 100"
-        : "SELECT title, genre, rating, year, director_and_stars, runtime FROM movies WHERE year = $1 LIMIT 100";
-    const values = parsedYear ? [parsedYear.data] : [];
+    const conditions: string[] = [];
+    const values: (string | number)[] = [];
+
+    if (filters.title !== undefined) {
+      values.push(`%${filters.title}%`);
+      conditions.push(`title ILIKE $${values.length}`);
+    }
+
+    if (filters.year !== undefined) {
+      values.push(filters.year);
+      conditions.push(`year = $${values.length}`);
+    }
+
+    if (filters.actor !== undefined) {
+      values.push(`%${filters.actor}%`);
+      conditions.push(`director_and_stars ILIKE $${values.length}`);
+    }
+
+    if (filters.genre !== undefined) {
+      values.push(`%${filters.genre}%`);
+      conditions.push(`genre ILIKE $${values.length}`);
+    }
+
+    if (filters.minRating !== undefined) {
+      values.push(filters.minRating);
+      conditions.push(`rating::numeric >= $${values.length}`);
+    }
+
+    const whereClause =
+      conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
+    const query = `SELECT title, genre, rating, year, director_and_stars, runtime FROM movies${whereClause} LIMIT 100`;
     const result = await client.query(query, values);
     const rows = result.rows;
 

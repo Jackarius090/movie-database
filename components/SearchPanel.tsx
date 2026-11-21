@@ -14,8 +14,11 @@ export default function SearchPanel() {
     queryKey: ["movies", filters],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (filters.year !== undefined) {
-        params.set("year", String(filters.year));
+
+      for (const [key, value] of Object.entries(filters)) {
+        if (value !== undefined && value !== "") {
+          params.set(key, String(value));
+        }
       }
 
       const query = params.toString();
@@ -41,9 +44,7 @@ export default function SearchPanel() {
     <section className="flex flex-col gap-4">
       <FilterPanel
         filters={filters}
-        onYearChange={(year) =>
-          setFilters((currentFilters) => ({ ...currentFilters, year }))
-        }
+        onFiltersChange={setFilters}
       />
       <div className="flex flex-col gap-4">
         {data.map((movie, index) => (
